@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+
+<canvas id="canvas" width="800" height="600">
+Your browser does not support the HTML canvas tag.</canvas>
+
+
+<h2 style="position: absolute;left: 25px;" id="placar1"></h1>
+<h2 style="position: absolute;left: 570px;" id="placar2"></h1>
+
+<audio src="sons/trilha.mp3" preload="auto" id="trilha" </audio>
+<audio src="sons/pontos.wav" preload="auto" id="pontos" </audio>
+<audio src="sons/colidiu.mp3" preload="auto" id="colidiu" </audio>
+
+
+<script>
+
+	//Variáveis do áudio do jogo
+	var somTrilha = document.getElementById("trilha");
+	var somPonto = document.getElementById("pontos");
+	var somColidiu = document.getElementById("colidiu");
+
+	//Canvas
+	var canvas = document.getElementById('canvas');
+	var ctx = canvas.getContext('2d');
+
+	//Váriáveis da Vaquinha
+	var xVaquinha = 130;
+	var yVaquinha = 555;
+
+	//Variáveis dos pontos
+	var pontosVitoria = 0;
+	var pontosDerrota = 0;
+
+	//Variáveis do carro
+	var carros = ["carro-1.png","carro-2.png","carro-3.png","carro-2.png","carro-3.png","carro-1.png"];
+	var xCarros = [800,750,750,750,800,750];
+	var yCarros = [80,160,240,330,410,490];
+
+	//Velocidade dos Carros
+	var vel10 = 10;
+	var vel15 = 15;
+	var vel20 = 20;
+
+	//Tamanho do carro
+	var comprimentoTodosCarros = 50;
+	var larguraTodosCarros = 30;
+
+	//Início do Jogo
+	setInterval(inicioJogo, 60);
+	function inicioJogo(){
+		somTrilha.play();
+		desenhaFundo();	
+		desenhaTodosCarros(carros,xCarros,yCarros);	
+		desenhaVaquinha();
+		movimentaCarros();
+		zeraPosicaoCarros();
+		zeraPosicaoVaquinhaVitoria();	
+		mostraPlacar();
+		colisao();
+	}	
+
+	//Função para mostrar o placar
+	function mostraPlacar(){
+		document.getElementById("placar1").innerHTML = "Pontos Vitoria: " + pontosVitoria;
+		document.getElementById("placar2").innerHTML = "Pontos Derrota: " + pontosDerrota;
+	}
+
+	//Função que deseja a estrada
+	function desenhaFundo() {
+			var imagemFundo = new Image();
+			imagemFundo.src = 'estrada.png';
+
+			imagemFundo.onload  = function() {
+				 ctx.drawImage(imagemFundo, 0, 0, 800, 600);
+			} 
+	}
+
+	
+	function desenhaTodosCarros(carros, xCarros, yCarros){
+		
+		for(var i = 0; i < carros.length; i++){
+			eval("var imagemCarro"+i+" = new Image()");
+			eval("imagemCarro"+i+".src = carros[i]");
+			
+			imagem = eval("imagemCarro"+i);
+
+			carregaTodasImagens(imagem,xCarros[i],yCarros[i]);
+		}
+
+	}
+
+	function carregaTodasImagens(imagem,xCarro,yCarro){
+			imagem.onload  = function() {
+				console.log("Imagemddd: " + imagem.src);
+				 ctx.drawImage(imagem, xCarro, yCarro, comprimentoTodosCarros, larguraTodosCarros);
+			} 
+	}
+
+	//Função que desenha os carros
+	function desenhaCarro(carro,xCarro,yCarro) {
+			var imagemCarro = new Image();
+			imagemCarro.src = carro;
+
+			imagemCarro.onload  = function() {
+				 ctx.drawImage(imagemCarro, xCarro, yCarro, comprimentoTodosCarros, larguraTodosCarros);
+			} 
+	}
+
+
+	//Função que desenha a vaquinha
+	function desenhaVaquinha() {
+			var imagemVaca = new Image(); // Using optional size for image
+			imagemVaca.src = 'ator-1.png';
+
+			imagemVaca.onload  = function() {
+				 ctx.drawImage(imagemVaca, xVaquinha, yVaquinha, 35, 35);
+			} // Draw when image has loaded
+	}
+
+
+	//Função que movimena a vaquinha com as setas para cima e para baixo
+	movimentaVaquinha();
+	function movimentaVaquinha(){
+		document.addEventListener('keydown', 
+			function(event) {
+
+				if(event.keyCode == 38) {
+					yVaquinha = yVaquinha - 5;
+				}
+
+		    	if(event.keyCode == 40) {
+		    		if(yVaquinha <=550){
+							yVaquinha = yVaquinha + 5;
+		    		}
+				}
+		
+		});
+	}
+
+	//Função que movimenta os carros
+	function movimentaCarros(){
+		xCarros[0] = xCarros[0] - vel20;
+		xCarros[1] = xCarros[1] - vel15;
+		xCarros[2] = xCarros[2] - vel10;
+		xCarros[3] = xCarros[3] - vel20;
+		xCarros[4] = xCarros[4] - vel10;
+		xCarros[5] = xCarros[5] - vel10;
+	}
+
+	function zeraPosicaoCarros(){
+
+		if(xCarros[0] <= -50){
+			xCarros[0] = 750;
+		}
+
+		if(xCarros[1] <= -50){
+			xCarros[1] = 750;
+		}
+
+		if(xCarros[2] <= -50){
+			xCarros[2] = 810;
+		}
+
+		if(xCarros[3] <= -50){
+			xCarros[3] = 850;
+		}
+
+		if(xCarros[4] <= -50){
+			xCarros[4] = 750;
+		}
+
+		if(xCarros[5] <= -50){
+			xCarros[5] = 800;
+		}
+	}
+
+	//Função que volta a vaquinha para a posição inicial em caso de vitória e adiciona 1 ponto na vitória
+	function zeraPosicaoVaquinhaVitoria(){
+		if(yVaquinha <= 6){
+			yVaquinha = 500;
+			pontosVitoria += 1;
+			somPonto.play();
+		}
+	}
+
+	//Função que volta a vaquinha para a posição inicial em caso de derrota e adiciona um ponto na derrota
+	function zeraPosicaoVaquinhaDerrota(){
+			yVaquinha = 550;
+			pontosDerrota += 1;
+			somColidiu.play();
+	}
+
+	function colisao() {
+
+		if(xCarros[0] <= 155 && xCarros[0] >=90 && yVaquinha <= 110 && yVaquinha >= 50){
+			zeraPosicaoVaquinhaDerrota();
+		}
+
+		if(xCarros[1] <= 155 && xCarros[1] >=90 && yVaquinha <= 185 && yVaquinha >= 130){
+			zeraPosicaoVaquinhaDerrota();
+		}
+
+		if(xCarros[2] <= 155 && xCarros[2] >=90 && yVaquinha <= 265 && yVaquinha >= 210){
+			zeraPosicaoVaquinhaDerrota();
+		}
+
+		if(xCarros[3] <= 155 && xCarros[3] >=90 && yVaquinha <= 355 && yVaquinha >= 300){
+			zeraPosicaoVaquinhaDerrota();
+		}
+
+		if(xCarros[4] <= 155 && xCarros[4] >=90 && yVaquinha <= 435 && yVaquinha >= 380){
+			zeraPosicaoVaquinhaDerrota();
+		}
+
+		if(xCarros[5] <= 155 && xCarros[5] >=90 && yVaquinha <= 515 && yVaquinha >= 460){
+			zeraPosicaoVaquinhaDerrota();
+		}
+	}
+
+</script>
+
+</body>
+</html>
